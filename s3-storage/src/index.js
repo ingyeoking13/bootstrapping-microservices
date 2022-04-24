@@ -4,7 +4,7 @@ const fs = require('fs');
 const {config} = require('./config');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = config.APP_PORT || 3000;
 
 const bucket_name = 'boocam-wiki';
 
@@ -14,15 +14,13 @@ const s3 = new AWS.S3({
   region: 'ap-northeast-2',
 });
 
-app.get('/', (req, res) => {
-  res.send('Hello World');
-});
-
 app.get('/video', (req, res) => {
+  console.log('answer : ' + req.query.path);
   const params = {
     Bucket: bucket_name,
     Key: req.query.path,
   };
+  res.status(200).setHeader('Content-Type', 'video/mp4');
   s3.getObject(params, (err, data) => {
     if (err) {
       res.status(500).json({
@@ -33,9 +31,8 @@ app.get('/video', (req, res) => {
   })
     .createReadStream()
     .pipe(res);
-  res.writeHead(200, {
-    'Content-Type': 'video/mp4',
-  });
+
+  return;
 });
 
 app.listen(port, () => {

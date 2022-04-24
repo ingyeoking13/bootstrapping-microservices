@@ -1,0 +1,22 @@
+version: '3.7'
+services:
+  s3-storage:
+    image: s3-storage
+    build:
+      context: ./s3-storage
+      dockerfile: Dockerfile
+    container_name: video-storage
+    ports:
+      - '4000:80'
+    restart: 'no'
+  video-streaming:
+    image: video-streaming
+    build:
+      context: ./video-streaming
+      dockerfile: Dockerfile
+    container_name: video-streaming
+    ports:
+      - '4001:80'
+    environment:
+      - VIDEO_STORAGE_HOST=video-storage
+    restart: 'no'
