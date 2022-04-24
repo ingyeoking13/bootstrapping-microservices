@@ -14,23 +14,29 @@ const s3 = new AWS.S3({
   region: 'ap-northeast-2',
 });
 
-app.get('/video', (req, res) => {
+app.get('/video', (req, res, next) => {
   console.log('answer : ' + req.query.path);
   const params = {
     Bucket: bucket_name,
     Key: req.query.path,
   };
-  res.status(200).setHeader('Content-Type', 'video/mp4');
-  s3.getObject(params, (err, data) => {
+  s3.headObject(params, (err, data) => {
     if (err) {
-      res.status(500).json({
-        message: err,
-      });
+      console.error(err);
       return;
     }
-  })
-    .createReadStream()
-    .pipe(res);
+    const stream = s3.getObject(params).createReadStream();
+    stream.on('error', (err, next) => {
+      return next();
+    });
+
+    res.setHeader('Content-Type', 'video/mp4');
+    res.setHeader('Content-Length', data.ContentLength);
+    stream.on('end', (_) => {
+      console.log('served by s3. ' + req.query.path);
+    });
+    stream.pipe(res);
+  });
 
   return;
 });
