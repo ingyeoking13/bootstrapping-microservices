@@ -22,12 +22,15 @@ app.get('/video', (req, res, next) => {
   };
   s3.headObject(params, (err, data) => {
     if (err) {
-      console.error(err);
+      next();
       return;
     }
     const stream = s3.getObject(params).createReadStream();
     stream.on('error', (err, next) => {
       return next();
+    });
+    stream.on('data', (chunk) => {
+      console.log('this is the data from file', chunk);
     });
 
     res.setHeader('Content-Type', 'video/mp4');
@@ -38,6 +41,13 @@ app.get('/video', (req, res, next) => {
     stream.pipe(res);
   });
 
+  return;
+});
+
+app.use((err, req, res, next) => {
+  res.sendStatus(500).json({
+    err: err,
+  });
   return;
 });
 
