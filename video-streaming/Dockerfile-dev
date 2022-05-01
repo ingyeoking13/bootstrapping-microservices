@@ -4,4 +4,5 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 COPY .env ./
 CMD npm install && \
+    npx wait-port rabbitmq:5672 && \
     npm run dev

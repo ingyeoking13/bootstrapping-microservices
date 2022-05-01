@@ -50,3 +50,20 @@ services:
     ports:
       - '4001:80'
     restart: 'no'
+
+  recommendations:
+    image: recommendations
+    build:
+      context: ./recommendations
+      dockerfile: Dockerfile-dev
+    volumes:
+      - ./recommendations/src:/usr/src/app/src
+    container_name: recommendations
+    depends_on:
+      db:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+    ports:
+      - '4003:80'
+    restart: 'no'

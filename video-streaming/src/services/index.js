@@ -35,4 +35,17 @@ function sendViewedMessageMQ(mq, videoPath) {
   mq.publish('', 'viewed', Buffer.from(jsonMsg));
 }
 
-module.exports = {sendViewedMessage, sendViewedMessageMQ};
+// rabbitmq - indirective messaging & exchange
+function sendViewedMessageExchange(mq, videoPath) {
+  console.log('Publishing message on viewed queue.');
+
+  const msg = {videoPath};
+  const jsonMsg = JSON.stringify(msg);
+  mq.publish('viewed', '', Buffer.from(jsonMsg));
+}
+
+module.exports = {
+  sendViewedMessage,
+  sendViewedMessageMQ,
+  sendViewedMessageExchange,
+};

@@ -5,7 +5,7 @@ const mqLoader = require('./mq');
 const {config} = require('./config');
 const fs = require('fs');
 const port = config.APP_PORT || 3000;
-const {sendViewedMessageMQ} = require('./services');
+const {sendViewedMessageExchange} = require('./services');
 
 let mq;
 
@@ -26,7 +26,7 @@ app.get('/video', (req, res) => {
         'Content-Type': 'video/mp4',
       });
       fs.createReadStream(videoPath).pipe(res);
-      sendViewedMessageMQ(mq, videoPath);
+      sendViewedMessageExchange(mq, videoPath);
     });
   } catch (e) {
     res.sendStatus(500);
@@ -38,6 +38,7 @@ app.get('/video', (req, res) => {
 app.listen(port, async () => {
   try {
     mq = await mqLoader();
+    mq.assertExchange('viewed', 'fanout');
     console.log('connected to rabbit!');
     console.log(`Example app listening on port ${port}`);
   } catch (e) {
