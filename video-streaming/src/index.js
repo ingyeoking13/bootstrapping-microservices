@@ -6,14 +6,15 @@ const mongodb = require('mongodb');
 const fs = require('fs');
 const app = express();
 const port = config.APP_PORT || 3000;
+// const {sendViewedMessage} = require('./services');
 
 app.get('/', async (req, res) => {
   res.send('Hello World');
 });
 
-app.get('/video', async (req, res) => {
+app.get('/video', (req, res) => {
   try {
-    const videoPath = './videos/SampleVideo_1280x720_1mb.mp4';
+    const videoPath = '../videos/SampleVideo_1280x720_1mb.mp4';
     fs.stat(videoPath, (err, stats) => {
       if (err) {
         res.sendStatus(err);
@@ -24,6 +25,7 @@ app.get('/video', async (req, res) => {
         'Content-Type': 'video/mp4',
       });
       fs.createReadStream(videoPath).pipe(res);
+      // sendViewedMessage(videoPath);
     });
   } catch (e) {
     res.sendStatus(500);
