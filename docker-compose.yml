@@ -7,6 +7,17 @@ services:
       - '4002:27017'
     restart: always
 
+  rabbitmq:
+    image: rabbitmq:3.9.16-management
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    expose:
+      - '5672'
+      - '15672'
+    container_name: rabbitmq
+    restart: always
+
   video-streaming:
     image: video-streaming
     build:
@@ -18,6 +29,9 @@ services:
       - ./video-streaming/videos:/usr/src/app/videos
     ports:
       - '4000:80'
+    depends_on:
+      rabbitmq:
+        condition: service_started
     restart: 'no'
 
   history:
@@ -28,6 +42,11 @@ services:
     volumes:
       - ./history/src:/usr/src/app/src
     container_name: history
+    depends_on:
+      db:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
     ports:
       - '4001:80'
     restart: 'no'

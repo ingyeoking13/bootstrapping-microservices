@@ -4,7 +4,10 @@ const {config} = require('./config');
 const app = express();
 const port = config.APP_PORT || 3000;
 const dbLoader = require('./db');
+const mqLoader = require('./mq');
+const {consumeViewedMessage} = require('./services');
 let db = null;
+let mq = null;
 
 app.use(express.json());
 
@@ -43,7 +46,18 @@ app.get('/history', async (req, res) => {
 });
 
 app.listen(port, async () => {
-  db = await dbLoader();
-  console.log('DB loaded.');
-  console.log(`Example app listening on port ${port}`);
+  try {
+    db = await dbLoader();
+    console.log('DB loaded.');
+    mq = await mqLoader();
+    await mq.assertQueue('viewed', {});
+    mq.consume('viewed', async (msg) => {
+      await consumeViewedMessage(db, mq, msg);
+    });
+    console.log('mq loaded.');
+    console.log(`Example app listening on port ${port}`);
+  } catch (e) {
+    console.log(e);
+    console.log('*o*');
+  }
 });

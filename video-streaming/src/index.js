@@ -1,10 +1,13 @@
 const express = require('express');
-const http = require('http');
+const app = express();
+
+const mqLoader = require('./mq');
 const {config} = require('./config');
 const fs = require('fs');
-const app = express();
 const port = config.APP_PORT || 3000;
-const {sendViewedMessage} = require('./services');
+const {sendViewedMessageMQ} = require('./services');
+
+let mq;
 
 app.get('/', async (req, res) => {
   res.send('Hello World');
@@ -23,7 +26,7 @@ app.get('/video', (req, res) => {
         'Content-Type': 'video/mp4',
       });
       fs.createReadStream(videoPath).pipe(res);
-      sendViewedMessage(videoPath);
+      sendViewedMessageMQ(mq, videoPath);
     });
   } catch (e) {
     res.sendStatus(500);
@@ -32,6 +35,13 @@ app.get('/video', (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+app.listen(port, async () => {
+  try {
+    mq = await mqLoader();
+    console.log('connected to rabbit!');
+    console.log(`Example app listening on port ${port}`);
+  } catch (e) {
+    console.log(e);
+    console.log('*o*');
+  }
 });

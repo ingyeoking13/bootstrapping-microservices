@@ -1,5 +1,7 @@
 const http = require('http');
+require('amqplib');
 
+// mongo db로 넣으라고 direct messaging
 function sendViewedMessage(videoPath) {
   const postOptions = {
     method: 'POST',
@@ -24,4 +26,13 @@ function sendViewedMessage(videoPath) {
   req.end();
 }
 
-module.exports = {sendViewedMessage};
+// rabbitmq - indirective messaging
+function sendViewedMessageMQ(mq, videoPath) {
+  console.log('Publishing message on viewed queue.');
+
+  const msg = {videoPath};
+  const jsonMsg = JSON.stringify(msg);
+  mq.publish('', 'viewed', Buffer.from(jsonMsg));
+}
+
+module.exports = {sendViewedMessage, sendViewedMessageMQ};
