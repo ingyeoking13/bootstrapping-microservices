@@ -1,12 +1,10 @@
 const express = require('express');
 const http = require('http');
 const {config} = require('./config');
-const db = require('./db');
-const mongodb = require('mongodb');
 const fs = require('fs');
 const app = express();
 const port = config.APP_PORT || 3000;
-// const {sendViewedMessage} = require('./services');
+const {sendViewedMessage} = require('./services');
 
 app.get('/', async (req, res) => {
   res.send('Hello World');
@@ -25,7 +23,7 @@ app.get('/video', (req, res) => {
         'Content-Type': 'video/mp4',
       });
       fs.createReadStream(videoPath).pipe(res);
-      // sendViewedMessage(videoPath);
+      sendViewedMessage(videoPath);
     });
   } catch (e) {
     res.sendStatus(500);

@@ -9,7 +9,7 @@ let db = null;
 app.use(express.json());
 
 app.get('/', (req, res) => {
-  res.send(`Hello World I'm history`);
+  res.send(`Hello World I'm history!`);
 });
 
 app.post('/viewed', async (req, res) => {
@@ -29,6 +29,7 @@ app.get('/history', async (req, res) => {
   const skip = parseInt(req.query.skip);
   const limit = parseInt(req.query.limit);
   try {
+    const videosCollections = db.collection('videos');
     const documents = await videosCollections
       .find()
       .skip(skip)
