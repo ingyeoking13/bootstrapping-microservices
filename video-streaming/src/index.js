@@ -14,7 +14,7 @@ app.get('/', async (req, res) => {
 
 app.get('/video', (req, res) => {
   try {
-    const videoPath = '../videos/SampleVideo_1280x720_1mb.mp4';
+    const videoPath = './videos/SampleVideo_1280x720_1mb.mp4';
     fs.stat(videoPath, (err, stats) => {
       if (err) {
         res.sendStatus(err);

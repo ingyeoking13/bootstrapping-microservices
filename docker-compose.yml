@@ -15,6 +15,7 @@ services:
     container_name: video-streaming
     volumes:
       - ./video-streaming/src:/usr/src/app/src
+      - ./video-streaming/videos:/usr/src/app/videos
     ports:
       - '4000:80'
     restart: 'no'
